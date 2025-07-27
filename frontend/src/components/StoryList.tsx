@@ -18,24 +18,33 @@ const StoryList: React.FC = () => {
     try {
       setIsLoading(true);
       setError(null);
+      console.log('Fetching stories...');
       const storiesData = await storyAPI.getStories();
-      setStories(storiesData);
+      console.log('Stories received:', storiesData);
+      
+      // Ensure we always have an array
+      setStories(Array.isArray(storiesData) ? storiesData : []);
     } catch (err: any) {
-      setError('Hikayeler yüklenirken bir hata oluştu.');
       console.error('Error fetching stories:', err);
+      setError('Hikayeler yüklenirken bir hata oluştu.');
+      setStories([]); // Set empty array on error
     } finally {
       setIsLoading(false);
     }
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('tr-TR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    try {
+      return new Date(dateString).toLocaleDateString('tr-TR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (error) {
+      return 'Tarih bilinmiyor';
+    }
   };
 
   if (isLoading) {
@@ -57,7 +66,7 @@ const StoryList: React.FC = () => {
     <div className="story-list">
       <h1>Hikayeler</h1>
       
-      {stories.length === 0 ? (
+      {!stories || stories.length === 0 ? (
         <div className="empty-state">
           <p>Henüz hiç hikaye oluşturulmamış.</p>
           <p>İlk hikayeyi oluşturmak için yukarıdaki formu kullanın!</p>
@@ -71,9 +80,9 @@ const StoryList: React.FC = () => {
               className="story-card-link"
             >
               <div className="story-card">
-                <h3 className="story-title">{story.title}</h3>
+                <h3 className="story-title">{story.title || 'İsimsiz Hikaye'}</h3>
                 <p className="story-topic">
-                  <strong>Konu:</strong> {story.topic}
+                  <strong>Konu:</strong> {story.topic || 'Konu belirtilmemiş'}
                 </p>
                 <p className="story-date">
                   {formatDate(story.created_at)}
