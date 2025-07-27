@@ -2,7 +2,7 @@ import axios from 'axios';
 import { Story, StoryListItem, StoryCreateRequest, StoryGenerationResponse } from '../types/story';
 
 const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://your-backend-url.com' 
+  ? 'llm-story-platform-production.up.railway.app'  // Your Railway backend URL
   : 'http://localhost:8000';
 
 const api = axios.create({
